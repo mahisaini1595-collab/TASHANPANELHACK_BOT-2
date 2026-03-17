@@ -125,21 +125,21 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
         except Exception:
             pass
 
-    # Feedback message just below the video
-    try:
-        await bot.send_message(user_id, feedback_msg)
-    except Exception as e:
-        logger.debug(f"Could not send feedback message to {user_id}: {e}")
-
     # Send down video after feedback
     try:
         if FILE_ID_CACHE["video_down"]:
-            await bot.send_video(user_id, FILE_ID_CACHE["video_down"], reply_markup=get_welcome_kb(), supports_streaming=True)
+            await bot.send_video(user_id, FILE_ID_CACHE["video_down"], supports_streaming=True)
         elif os.path.exists(DOWN_VIDEO_PATH):
-            sent2 = await bot.send_video(user_id, FSInputFile(DOWN_VIDEO_PATH), reply_markup=get_welcome_kb(), supports_streaming=True)
+            sent2 = await bot.send_video(user_id, FSInputFile(DOWN_VIDEO_PATH), supports_streaming=True)
             FILE_ID_CACHE["video_down"] = sent2.video.file_id
     except Exception as e:
         logger.error(f"Error sending down video to {user_id}: {e}")
+
+    # Feedback message below the down video (no buttons)
+    try:
+        await bot.send_message(user_id, feedback_msg, reply_markup=None)
+    except Exception as e:
+        logger.debug(f"Could not send feedback message to {user_id}: {e}")
 
     # Send APK with caption
     try:
