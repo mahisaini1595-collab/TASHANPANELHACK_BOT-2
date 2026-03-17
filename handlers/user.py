@@ -16,11 +16,11 @@ logger = logging.getLogger(__name__)
 
 # File paths (Absolute to avoid cwd issues)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VIDEO_PATH = os.path.join(BASE_DIR, "IMG_2518.MP4")
+VIDEO_PATH = os.path.join(BASE_DIR, "IMG_2717-top.mp4")
 APK_CANDIDATE_PATHS = [
     os.path.join(
         BASE_DIR,
-        "\U0001d5e9\U0001d5dc\U0001d5e3 \U0001d5e3\U0001d5d4\U0001d5e1\U0001d5e1\U0001d5d8\U0001d5df_1.0.apk",
+        "𝗠𝗔𝗚𝗜𝗖 𝗧𝗢𝗢𝗟 𝗣𝗥𝗢.apk",
     ),
 ]
 
@@ -102,6 +102,11 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
 💎 VIP PANEL ACTIVATED
 """.strip()
 
+    feedback_msg = (
+        "𝗣𝗔𝗡𝗘𝗟 𝗙𝗘𝗘𝗗𝗕𝗔𝗖𝗞𝗦 ❤️‍🔥❤️‍🔥..\n\n"
+        "❤️‍🔥Members MAGIC TOOL PRO  Winning Feedback🚀"
+    )
+
     # Send video with caption
     try:
         if FILE_ID_CACHE["video"]:
@@ -117,6 +122,12 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
             await bot.send_message(user_id, welcome_caption, reply_markup=get_welcome_kb())
         except Exception:
             pass
+
+    # Feedback message just below the video
+    try:
+        await bot.send_message(user_id, feedback_msg)
+    except Exception as e:
+        logger.debug(f"Could not send feedback message to {user_id}: {e}")
 
     # Send APK with caption
     try:
