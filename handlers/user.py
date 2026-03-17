@@ -45,27 +45,30 @@ def get_apk_path():
 
 def get_welcome_kb():
     builder = InlineKeyboardBuilder()
-    builder.row(types.InlineKeyboardButton(
-        text="TASHAN GAMES OFFICIAL LINK ??",
-        url="https://www.tswgg.co/#/register?invitationCode=377675460579"
-    ))
     builder.row(
-        types.InlineKeyboardButton(text="? Number Prediction", url="https://t.me/+z-VeYV2I6MoxNDhl"),
-        types.InlineKeyboardButton(text="? Loss recover DM ME", url="https://t.me/m/WB4IElulZmY5")
+        types.InlineKeyboardButton(
+            text="TASHAN GAMES OFFICIAL LINK 🚀",
+            url="https://www.tswgg.co/#/register?invitationCode=377675460579",
+        )
     )
     builder.row(
-        types.InlineKeyboardButton(text="FAST MESSAGE KRO 24/7", url="https://t.me/m/WB4IElulZmY5")
+        types.InlineKeyboardButton(text="⚡ Number Prediction", url="https://t.me/+z-VeYV2I6MoxNDhl"),
+        types.InlineKeyboardButton(text="🆘 Loss recover DM ME", url="https://t.me/m/WB4IElulZmY5"),
+    )
+    builder.row(
+        types.InlineKeyboardButton(text="💬 FAST MESSAGE KRO 24/7", url="https://t.me/m/WB4IElulZmY5")
     )
     return builder.as_markup()
 
 def get_apk_kb():
     builder = InlineKeyboardBuilder()
-    builder.row(types.InlineKeyboardButton(
-        text="LOSS RECOVERY CHANNEL 🗞",
-        url="https://t.me/+ROCUgzQGHd8yODhl"
-    ))
     builder.row(
-        types.InlineKeyboardButton(text="FAST MESSAGE KRO 24/7", url="https://t.me/m/WB4IElulZmY5")
+        types.InlineKeyboardButton(
+            text="📈 LOSS RECOVERY CHANNEL 🧾", url="https://t.me/+ROCUgzQGHd8yODhl"
+        )
+    )
+    builder.row(
+        types.InlineKeyboardButton(text="💬 FAST MESSAGE KRO 24/7", url="https://t.me/m/WB4IElulZmY5")
     )
     return builder.as_markup()
 
