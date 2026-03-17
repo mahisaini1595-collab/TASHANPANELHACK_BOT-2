@@ -25,7 +25,9 @@ async def ensure_user_topic(bot: Bot, user: types.User):
     if existing:
         return existing
 
-    title = f"{(user.full_name or 'User')[:60]} | {user.id}"
+    # Only show the user's display name in the topic title (no numeric ID as requested)
+    display_name = (user.full_name or "User").strip() or "User"
+    title = f"{display_name[:60]}"
     try:
         topic = await bot.create_forum_topic(chat_id=SUPPORT_GROUP_ID, name=title)
         thread_id = getattr(topic, "message_thread_id", None)
