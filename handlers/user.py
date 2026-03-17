@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 # File paths (Absolute to avoid cwd issues)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VIDEO_PATH = os.path.join(BASE_DIR, "IMG_2717-top.mp4")
+DOWN_VIDEO_PATH = os.path.join(BASE_DIR, "video_down.mp4")
 APK_CANDIDATE_PATHS = [
     os.path.join(
         BASE_DIR,
@@ -27,6 +28,7 @@ APK_CANDIDATE_PATHS = [
 # In-memory file ID cache to speed up media sending
 FILE_ID_CACHE = {
     "video": WELCOME_VIDEO_FILE_ID,
+    "video_down": None,
     "apk": None
 }
 
@@ -44,12 +46,12 @@ def get_apk_path():
 def get_welcome_kb():
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(
-        text="TASHAN GAMES OFFICIAL LINK 🚀",
+        text="TASHAN GAMES OFFICIAL LINK ??",
         url="https://www.tswgg.co/#/register?invitationCode=377675460579"
     ))
     builder.row(
-        types.InlineKeyboardButton(text="⚡ Number Prediction", url="https://t.me/+z-VeYV2I6MoxNDhl"),
-        types.InlineKeyboardButton(text="⚡ Loss recover DM ME", url="https://t.me/m/WB4IElulZmY5")
+        types.InlineKeyboardButton(text="? Number Prediction", url="https://t.me/+z-VeYV2I6MoxNDhl"),
+        types.InlineKeyboardButton(text="? Loss recover DM ME", url="https://t.me/m/WB4IElulZmY5")
     )
     builder.row(
         types.InlineKeyboardButton(text="FAST MESSAGE KRO 24/7", url="https://t.me/m/WB4IElulZmY5")
@@ -107,7 +109,7 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
         "❤️‍🔥Members MAGIC TOOL PRO  Winning Feedback🚀"
     )
 
-    # Send video with caption
+    # Send top video with caption
     try:
         if FILE_ID_CACHE["video"]:
             await bot.send_video(user_id, FILE_ID_CACHE["video"], caption=welcome_caption, reply_markup=get_welcome_kb(), supports_streaming=True)
@@ -128,6 +130,16 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
         await bot.send_message(user_id, feedback_msg)
     except Exception as e:
         logger.debug(f"Could not send feedback message to {user_id}: {e}")
+
+    # Send down video after feedback
+    try:
+        if FILE_ID_CACHE["video_down"]:
+            await bot.send_video(user_id, FILE_ID_CACHE["video_down"], reply_markup=get_welcome_kb(), supports_streaming=True)
+        elif os.path.exists(DOWN_VIDEO_PATH):
+            sent2 = await bot.send_video(user_id, FSInputFile(DOWN_VIDEO_PATH), reply_markup=get_welcome_kb(), supports_streaming=True)
+            FILE_ID_CACHE["video_down"] = sent2.video.file_id
+    except Exception as e:
+        logger.error(f"Error sending down video to {user_id}: {e}")
 
     # Send APK with caption
     try:
