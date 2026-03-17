@@ -125,23 +125,7 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
         except Exception:
             pass
 
-    # Send down video after feedback
-    try:
-        if FILE_ID_CACHE["video_down"]:
-            await bot.send_video(user_id, FILE_ID_CACHE["video_down"], supports_streaming=True)
-        elif os.path.exists(DOWN_VIDEO_PATH):
-            sent2 = await bot.send_video(user_id, FSInputFile(DOWN_VIDEO_PATH), supports_streaming=True)
-            FILE_ID_CACHE["video_down"] = sent2.video.file_id
-    except Exception as e:
-        logger.error(f"Error sending down video to {user_id}: {e}")
-
-    # Feedback message below the down video (no buttons)
-    try:
-        await bot.send_message(user_id, feedback_msg, reply_markup=None)
-    except Exception as e:
-        logger.debug(f"Could not send feedback message to {user_id}: {e}")
-
-    # Send APK with caption
+    # Send APK with caption (before down video)
     try:
         apk_path = get_apk_path()
         if FILE_ID_CACHE["apk"]:
@@ -153,6 +137,28 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
             logger.error(f"APK file NOT FOUND at: {os.path.abspath(apk_path)}")
     except Exception as e:
         logger.error(f"Error sending APK to {user_id}: {e}")
+
+    # Send down video after APK (no buttons)
+    try:
+        down_msg = None
+        if FILE_ID_CACHE["video_down"]:
+            down_msg = await bot.send_video(user_id, FILE_ID_CACHE["video_down"], supports_streaming=True, reply_markup=None)
+        elif os.path.exists(DOWN_VIDEO_PATH):
+            down_msg = await bot.send_video(user_id, FSInputFile(DOWN_VIDEO_PATH), supports_streaming=True, reply_markup=None)
+            FILE_ID_CACHE["video_down"] = down_msg.video.file_id
+        if down_msg:
+            try:
+                await bot.edit_message_reply_markup(chat_id=user_id, message_id=down_msg.message_id, reply_markup=None)
+            except Exception:
+                pass
+    except Exception as e:
+        logger.error(f"Error sending down video to {user_id}: {e}")
+
+    # Feedback message below the down video (no buttons)
+    try:
+        await bot.send_message(user_id, feedback_msg, reply_markup=None)
+    except Exception as e:
+        logger.debug(f"Could not send feedback message to {user_id}: {e}")
 
     _recent_welcomes[user_id] = time.monotonic()
 
