@@ -8,7 +8,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.types import FSInputFile, ChatJoinRequest, ChatMemberUpdated
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from config import DATABASE_NAME, CHANNEL_ID, SUPPORT_GROUP_ID, WELCOME_VIDEO_FILE_ID
+from config import DATABASE_NAME, CHANNEL_ID, SUPPORT_GROUP_ID
 from database import Database
 from handlers.support import ensure_user_topic
 
@@ -16,8 +16,10 @@ router = Router()
 db = Database(DATABASE_NAME)
 logger = logging.getLogger(__name__)
 
-# File paths (absolute to avoid cwd issues)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+WELCOME_ANIMATION_CANDIDATE_PATHS = [
+    os.path.join(BASE_DIR, "IMG_2717-top-autoplay.mp4"),
+]
 VIDEO_CANDIDATE_PATHS = [
     os.path.join(BASE_DIR, "IMG_2717-top.mp4"),
     os.path.join(BASE_DIR, "IMG_2717-top.MP4"),
@@ -27,14 +29,12 @@ DOWN_VIDEO_CANDIDATE_PATHS = [
     os.path.join(BASE_DIR, "video_down.MP4"),
 ]
 
-# In-memory file ID cache to speed up media sending
 FILE_ID_CACHE = {
-    "video": WELCOME_VIDEO_FILE_ID,
+    "welcome_animation": None,
     "video_down": None,
     "apk": None,
 }
 
-# Avoid duplicate welcomes when both join-request and chat_member fire
 _recent_welcomes = {}
 _WELCOME_DEDUP_SECONDS = 180
 
@@ -44,6 +44,13 @@ def get_existing_path(candidate_paths, fallback_path):
         if os.path.exists(path):
             return path
     return fallback_path
+
+
+def get_welcome_animation_path():
+    return get_existing_path(
+        WELCOME_ANIMATION_CANDIDATE_PATHS,
+        WELCOME_ANIMATION_CANDIDATE_PATHS[0],
+    )
 
 
 def get_video_path():
@@ -121,7 +128,7 @@ def build_leave_user_warning() -> str:
 
 
 async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
-    """Send welcome video + APK sequentially."""
+    """Send welcome autoplay media + APK sequentially."""
     welcome_caption = (
         "Hᴇʟʟᴏ Dᴇᴀʀ, Mᴀɪ RUDRA BHAI Hᴜ Aᴀᴘᴋᴇ Rᴇǫᴜᴇsᴛ Cʜᴀɴɴᴇʟ "
         "Mᴀɪ Aᴄᴄᴇᴘᴛ Hᴏ Jᴀʏᴀɢɪ ❤️\n\n"
@@ -146,39 +153,50 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
         "❤️‍🔥Members Winning Feedback🚀"
     )
 
-    # Send top video with caption
-    video_sent = False
-    video_path = get_video_path()
+    media_sent = False
+    welcome_animation_path = get_welcome_animation_path()
+    fallback_video_path = get_video_path()
 
-    if FILE_ID_CACHE["video"]:
+    if FILE_ID_CACHE["welcome_animation"]:
+        try:
+            await bot.send_animation(
+                user_id,
+                FILE_ID_CACHE["welcome_animation"],
+                caption=welcome_caption,
+                reply_markup=get_welcome_kb(),
+            )
+            media_sent = True
+        except Exception as e:
+            logger.error(f"Error sending cached welcome animation to {user_id}: {e}")
+            FILE_ID_CACHE["welcome_animation"] = None
+
+    if not media_sent and os.path.exists(welcome_animation_path):
+        try:
+            sent = await bot.send_animation(
+                user_id,
+                FSInputFile(welcome_animation_path),
+                caption=welcome_caption,
+                reply_markup=get_welcome_kb(),
+            )
+            FILE_ID_CACHE["welcome_animation"] = sent.animation.file_id
+            media_sent = True
+        except Exception as e:
+            logger.error(f"Error sending local welcome animation to {user_id}: {e}")
+
+    if not media_sent and os.path.exists(fallback_video_path):
         try:
             await bot.send_video(
                 user_id,
-                FILE_ID_CACHE["video"],
+                FSInputFile(fallback_video_path),
                 caption=welcome_caption,
                 reply_markup=get_welcome_kb(),
                 supports_streaming=True,
             )
-            video_sent = True
+            media_sent = True
         except Exception as e:
-            logger.error(f"Error sending cached video to {user_id}: {e}")
-            FILE_ID_CACHE["video"] = None
+            logger.error(f"Error sending fallback video to {user_id}: {e}")
 
-    if not video_sent and os.path.exists(video_path):
-        try:
-            sent = await bot.send_video(
-                user_id,
-                FSInputFile(video_path),
-                caption=welcome_caption,
-                reply_markup=get_welcome_kb(),
-                supports_streaming=True,
-            )
-            FILE_ID_CACHE["video"] = sent.video.file_id
-            video_sent = True
-        except Exception as e:
-            logger.error(f"Error sending local video to {user_id}: {e}")
-
-    if not video_sent:
+    if not media_sent:
         try:
             await bot.send_message(
                 user_id,
@@ -188,7 +206,6 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
         except Exception:
             pass
 
-    # Send APK with caption (before down video)
     try:
         apk_path = get_apk_path()
         if FILE_ID_CACHE["apk"]:
@@ -211,7 +228,6 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
     except Exception as e:
         logger.error(f"Error sending APK to {user_id}: {e}")
 
-    # Send down video after APK (no buttons)
     try:
         down_video_path = get_down_video_path()
         down_msg = None
@@ -242,7 +258,6 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
     except Exception as e:
         logger.error(f"Error sending down video to {user_id}: {e}")
 
-    # Feedback message below the down video (no buttons)
     try:
         await bot.send_message(user_id, feedback_msg, reply_markup=None)
     except Exception as e:
@@ -279,7 +294,6 @@ async def auto_welcome_join_request(request: ChatJoinRequest, bot: Bot):
 
 @router.chat_member()
 async def on_chat_member_update(update: ChatMemberUpdated, bot: Bot):
-    """Handle join + leave events for the channel."""
     if update.chat.id != CHANNEL_ID:
         return
 
