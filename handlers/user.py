@@ -142,10 +142,10 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
     )
 
     apk_caption = (
-        "📦 CLICK AND INSTALL NOW\n"
-        "⚠️ IMPORTANT: Pahle Video Dekho Uske Baad Use Karo!\n"
-        "✅ 100% ACCURATE NUMBER SHOTS\n"
-        "💎 VIP PANEL ACTIVATED"
+        "🌟𝟏𝟎𝟎% 𝐖ᴏʀᴋɪɴɢ 𝐀ɪ 𝐒ᴇʀᴠᴇʀ ‼️\n"
+        "👹 𝐏ʀɪᴠᴇᴛ 𝐒ᴇʀᴠᴇʀ 🌟\n"
+        "🌟 𝐎ɴʟʏ 𝐒ᴜʀᴇꜱʜᴏʀᴛ 🌟\n"
+        "🖤 𝐃ᴀɪʟʏ 500 DEPOSIT 4K PROFIT✅"
     )
 
     feedback_msg = (
