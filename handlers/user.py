@@ -144,9 +144,11 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
     )
 
     # Send top video with caption
-    try:
-        video_path = get_video_path()
-        if FILE_ID_CACHE["video"]:
+    video_sent = False
+    video_path = get_video_path()
+
+    if FILE_ID_CACHE["video"]:
+        try:
             await bot.send_video(
                 user_id,
                 FILE_ID_CACHE["video"],
@@ -154,7 +156,13 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
                 reply_markup=get_welcome_kb(),
                 supports_streaming=True,
             )
-        elif os.path.exists(video_path):
+            video_sent = True
+        except Exception as e:
+            logger.error(f"Error sending cached video to {user_id}: {e}")
+            FILE_ID_CACHE["video"] = None
+
+    if not video_sent and os.path.exists(video_path):
+        try:
             sent = await bot.send_video(
                 user_id,
                 FSInputFile(video_path),
@@ -163,14 +171,11 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
                 supports_streaming=True,
             )
             FILE_ID_CACHE["video"] = sent.video.file_id
-        else:
-            await bot.send_message(
-                user_id,
-                welcome_caption,
-                reply_markup=get_welcome_kb(),
-            )
-    except Exception as e:
-        logger.error(f"Error sending video to {user_id}: {e}")
+            video_sent = True
+        except Exception as e:
+            logger.error(f"Error sending local video to {user_id}: {e}")
+
+    if not video_sent:
         try:
             await bot.send_message(
                 user_id,
