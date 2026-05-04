@@ -86,8 +86,8 @@ def get_welcome_kb():
     builder = InlineKeyboardBuilder()
     builder.row(
         types.InlineKeyboardButton(
-            text="TASHAN GAMES OFFICIAL LINK 🚀",
-            url="https://www.tswgg.co/#/register?invitationCode=377675460579",
+            text="JAI CLUB GAMES OFFICIAL LINK 🚀",
+            url="https://www.jaiclub77.com/#/register?invitationCode=671632043612",
         )
     )
     builder.row(
@@ -97,7 +97,7 @@ def get_welcome_kb():
         ),
         types.InlineKeyboardButton(
             text="🆘 Loss recover DM ME",
-            url="https://t.me/m/WB4IElulZmY5",
+            url="https://t.me/m/aYdapJjCMDQx",
         ),
     )
     builder.row(
@@ -114,7 +114,7 @@ def get_apk_kb():
     builder.row(
         types.InlineKeyboardButton(
             text="📈 LOSS RECOVERY CHANNEL 🧾",
-            url="https://t.me/+ROCUgzQGHd8yODhl",
+            url="https://t.me/m/aYdapJjCMDQx",
         )
     )
     builder.row(

@@ -42,7 +42,7 @@ async def main():
         await bot.set_chat_menu_button(
             menu_button=MenuButtonWebApp(
                 text="Play Game",
-                web_app=WebAppInfo(url="https://www.tswgg.co/#/register?invitationCode=377675460579")
+                web_app=WebAppInfo(url="https://www.jaiclub77.com/#/register?invitationCode=671632043612")
             )
         )
         logger.info("Menu button 'Play Game' set successfully.")
