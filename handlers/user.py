@@ -123,12 +123,15 @@ def build_leave_user_warning() -> str:
 async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
     """Send welcome video + APK sequentially."""
     welcome_caption = (
-        f"👋 <b>Welcome {full_name}!</b>\n\n"
-        "🚀 Premium Hack Update Ready\n"
-        "📱 Version 4.5 Pro\n\n"
-        "✅ Real Working Proof Available\n"
-        "⭐ Trusted by 15K+ Users\n\n"
-        "👇 Tap to Continue"
+        "Hᴇʟʟᴏ Dᴇᴀʀ, Mᴀɪ RUDRA BHAI Hᴜ Aᴀᴘᴋᴇ Rᴇǫᴜᴇsᴛ Cʜᴀɴɴᴇʟ "
+        "Mᴀɪ Aᴄᴄᴇᴘᴛ Hᴏ Jᴀʏᴀɢɪ ❤️\n\n"
+        "Aɴᴅ Aɢᴀʀ Aᴀᴘᴋᴀ Bʜɪ Cᴏʟᴏᴜʀ Tʀᴀᴅɪɴɢ Mᴀɪ 10ᴋ Sᴇ Jᴀᴅᴀ "
+        "Lᴏss Hᴜᴀ Tʜᴏ Is Iᴅ Pᴇ Mᴇssᴇɢᴇ Kᴀʀᴏ 😍 Rᴇᴄᴏᴠᴇʀ Kᴀʀᴠᴀ Dᴜɴɢᴀ\n\n"
+        "https://t.me/+bN5NtJIt9bs1NDA1\n"
+        "https://t.me/+8MC66Wka4-w1NmNl\n\n"
+        "USERNAME: @rudraarmy0\n\n"
+        "Yᴇ Lᴏ Vɪᴘ Sᴜʙ Mᴇᴍʙᴇʀ Jᴏɪɴ Mᴀʀ Lᴏ Yᴀʜᴀ Nᴜᴍʙᴇʀ "
+        "Bᴇᴛ MɪʟLLᴇɢᴀ ✅"
     )
 
     apk_caption = (
