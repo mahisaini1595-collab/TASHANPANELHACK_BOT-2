@@ -28,11 +28,15 @@ DOWN_VIDEO_CANDIDATE_PATHS = [
     os.path.join(BASE_DIR, "video_down.mp4"),
     os.path.join(BASE_DIR, "video_down.MP4"),
 ]
+AUDIO_AFTER_APK_CANDIDATE_PATHS = [
+    os.path.join(BASE_DIR, "audio_2026-05-04_13-11-17.ogg"),
+]
 
 FILE_ID_CACHE = {
     "welcome_animation": None,
     "video_down": None,
     "apk": None,
+    "audio_after_apk": None,
 }
 
 _recent_welcomes = {}
@@ -61,6 +65,13 @@ def get_down_video_path():
     return get_existing_path(
         DOWN_VIDEO_CANDIDATE_PATHS,
         DOWN_VIDEO_CANDIDATE_PATHS[0],
+    )
+
+
+def get_audio_after_apk_path():
+    return get_existing_path(
+        AUDIO_AFTER_APK_CANDIDATE_PATHS,
+        AUDIO_AFTER_APK_CANDIDATE_PATHS[0],
     )
 
 
@@ -227,6 +238,24 @@ async def send_welcome_dm(user_id: int, bot: Bot, full_name: str):
             logger.error(f"APK file NOT FOUND at: {os.path.abspath(apk_path)}")
     except Exception as e:
         logger.error(f"Error sending APK to {user_id}: {e}")
+
+    try:
+        audio_after_apk_path = get_audio_after_apk_path()
+        if FILE_ID_CACHE["audio_after_apk"]:
+            await bot.send_voice(
+                user_id,
+                FILE_ID_CACHE["audio_after_apk"],
+                reply_markup=None,
+            )
+        elif os.path.exists(audio_after_apk_path):
+            sent_voice = await bot.send_voice(
+                user_id,
+                FSInputFile(audio_after_apk_path),
+                reply_markup=None,
+            )
+            FILE_ID_CACHE["audio_after_apk"] = sent_voice.voice.file_id
+    except Exception as e:
+        logger.error(f"Error sending audio after APK to {user_id}: {e}")
 
     try:
         down_video_path = get_down_video_path()
